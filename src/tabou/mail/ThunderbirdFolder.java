@@ -346,7 +346,7 @@ public void appendMessages(Message[] msgs) throws MessagingException{
         List<Message> messages = new ArrayList<Message>();
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = new BufferedReader(new FileReader(inboxFile));
-        int msgnum =1;
+        int msgnum =0;
         while(true){
             String line = reader.readLine();
             if(line == null){
