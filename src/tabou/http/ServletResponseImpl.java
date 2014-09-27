@@ -15,7 +15,7 @@
  */
 
 
-package org.apache.commons.messagelet.impl;
+package tabou.http;
 
 
 import java.io.IOException;
@@ -164,82 +164,6 @@ public class ServletResponseImpl implements ServletResponse {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Create and return a ServletOutputStream to write the content
-     * associated with this Response.
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    public ServletOutputStream createOutputStream() throws IOException {
-
-        //return (new ResponseStream(this));
-        return new BufferedServletOutputStream();
-    }
-
-
-    /**
-     * Perform whatever actions are required to flush and close the output
-     * stream or writer, in a single operation.
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    public void finishResponse() throws IOException {
-
-        // If no stream has been requested yet, get one so we can
-        // flush the necessary headers
-        if (this.stream == null) {
-            ServletOutputStream sos = getOutputStream();
-            sos.flush();
-            sos.close();
-            return;
-        }
-
-        // If our stream is closed, no action is necessary
-/*        
-        if ( ((ResponseStream) stream).closed() )
-            return;
-*/
-
-        // Flush and close the appropriate output mechanism
-        if (writer != null) {
-            writer.flush();
-            writer.close();
-        } else {
-            stream.flush();
-            stream.close();
-        }
-
-        // The underlying output stream (perhaps from a socket)
-        // is not our responsibility
-
-    }
-
-
-    /**
-     * Return the content length that was set or calculated for this Response.
-     */
-    public int getContentLength() {
-
-        return (this.contentLength);
-
-    }
-
-
-    /**
-     * Return the content type that was set or calculated for this response,
-     * or <code>null</code> if no content type was set.
-     */
-    public String getContentType() {
-
-        return (this.contentType);
-
-    }
-
-
-
-    // -------------------------------------------------------- Package Methods
-
-
 
     // ------------------------------------------------ ServletResponse Methods
 
@@ -299,8 +223,8 @@ public class ServletResponseImpl implements ServletResponse {
             throw new IllegalStateException( "getWriter() has already been called" );
         }
 
-        if (stream == null)
-            stream = createOutputStream();
+//        if (stream == null)
+//            stream = createOutputStream();
 /*        
         ((ResponseStream) stream).setCommit(true);
 */
@@ -335,7 +259,7 @@ public class ServletResponseImpl implements ServletResponse {
             throw new IllegalStateException( "getOutputStream() has already been called" );
         }
 
-        stream = createOutputStream();
+//        stream = createOutputStream();
         
         // a slight hack which slightly breaks the Servlet contract...
         // see commented out section below for what it should be...

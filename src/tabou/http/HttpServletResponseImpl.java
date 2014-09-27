@@ -15,12 +15,13 @@
  */
 
 
-package org.apache.commons.messagelet.impl;
+package tabou.http;
 
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -43,7 +44,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
     /**
      * The set of Cookies associated with this Response.
      */
-    protected ArrayList cookies = new ArrayList();
+    protected ArrayList<Cookie> cookies = new ArrayList<Cookie>();
 
 
     /**
@@ -62,14 +63,14 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * This collection is keyed by the header name, and the elements are
      * ArrayLists containing the associated values that have been set.
      */
-    protected HashMap headers = new HashMap();
+    protected HashMap<String,List<String>> headers = new HashMap<String,List<String>>();
 
 
 
     /**
      * The error message set by <code>sendError()</code>.
      */
-    protected String message = getStatusMessage(HttpServletResponse.SC_OK);
+//    protected String message = getStatusMessage(HttpServletResponse.SC_OK);
 
 
     /**
@@ -88,228 +89,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Return an array of all cookies set for this response, or
-     * a zero-length array if no cookies have been set.
-     */
-    public Cookie[] getCookies() {
-
-        synchronized (cookies) {
-            return ((Cookie[]) cookies.toArray(new Cookie[cookies.size()]));
-        }
-
-    }
-
-
-    /**
-     * Return the value for the specified header, or <code>null</code> if this
-     * header has not been set.  If more than one value was added for this
-     * name, only the first is returned; use getHeaderValues() to retrieve all
-     * of them.
-     *
-     * @param name Header name to look up
-     */
-    public String getHeader(String name) {
-
-        ArrayList values = null;
-        synchronized (headers) {
-            values = (ArrayList) headers.get(name);
-        }
-        if (values != null)
-            return ((String) values.get(0));
-        else
-            return (null);
-
-    }
-
-
-    /**
-     * Return an array of all the header names set for this response, or
-     * a zero-length array if no headers have been set.
-     */
-    public String[] getHeaderNames() {
-
-        synchronized (headers) {
-            String results[] = new String[headers.size()];
-            return ((String[]) headers.keySet().toArray(results));
-        }
-
-    }
-
-
-    /**
-     * Return an array of all the header values associated with the
-     * specified header name, or an zero-length array if there are no such
-     * header values.
-     *
-     * @param name Header name to look up
-     */
-    public String[] getHeaderValues(String name) {
-
-        ArrayList values = null;
-        synchronized (headers) {
-            values = (ArrayList) headers.get(name);
-        }
-        if (values == null)
-            return (new String[0]);
-        String results[] = new String[values.size()];
-        return ((String[]) values.toArray(results));
-
-    }
-
-
-    /**
-     * Return the error message that was set with <code>sendError()</code>
-     * for this Response.
-     */
-    public String getMessage() {
-
-        return (this.message);
-
-    }
-
-
-    /**
-     * Return the HTTP status code associated with this Response.
-     */
-    public int getStatus() {
-
-        return (this.status);
-
-    }
-
-
-    /**
-     * Release all object references, and initialize instance variables, in
-     * preparation for reuse of this object.
-     */
-    public void recycle() {
-        //super.recycle();
-        cookies.clear();
-        headers.clear();
-        message = getStatusMessage(HttpServletResponse.SC_OK);
-        status = HttpServletResponse.SC_OK;
-
-    }
-
-
-    /**
-     * Reset this response, and specify the values for the HTTP status code
-     * and corresponding message.
-     *
-     * @exception IllegalStateException if this response has already been
-     *  committed
-     */
-    public void reset(int status, String message) {
-
-        reset();
-        setStatus(status, message);
-
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Returns a default status message for the specified HTTP status code.
-     *
-     * @param status The status code for which a message is desired
-     */
-    protected String getStatusMessage(int status) {
-
-        switch (status) {
-        case SC_OK:
-            return ("OK");
-        case SC_ACCEPTED:
-            return ("Accepted");
-        case SC_BAD_GATEWAY:
-            return ("Bad Gateway");
-        case SC_BAD_REQUEST:
-            return ("Bad Request");
-        case SC_CONFLICT:
-            return ("Conflict");
-        case SC_CONTINUE:
-            return ("Continue");
-        case SC_CREATED:
-            return ("Created");
-        case SC_EXPECTATION_FAILED:
-            return ("Expectation Failed");
-        case SC_FORBIDDEN:
-            return ("Forbidden");
-        case SC_GATEWAY_TIMEOUT:
-            return ("Gateway Timeout");
-        case SC_GONE:
-            return ("Gone");
-        case SC_HTTP_VERSION_NOT_SUPPORTED:
-            return ("HTTP Version Not Supported");
-        case SC_INTERNAL_SERVER_ERROR:
-            return ("Internal Server Error");
-        case SC_LENGTH_REQUIRED:
-            return ("Length Required");
-        case SC_METHOD_NOT_ALLOWED:
-            return ("Method Not Allowed");
-        case SC_MOVED_PERMANENTLY:
-            return ("Moved Permanently");
-        case SC_MOVED_TEMPORARILY:
-            return ("Moved Temporarily");
-        case SC_MULTIPLE_CHOICES:
-            return ("Multiple Choices");
-        case SC_NO_CONTENT:
-            return ("No Content");
-        case SC_NON_AUTHORITATIVE_INFORMATION:
-            return ("Non-Authoritative Information");
-        case SC_NOT_ACCEPTABLE:
-            return ("Not Acceptable");
-        case SC_NOT_FOUND:
-            return ("Not Found");
-        case SC_NOT_IMPLEMENTED:
-            return ("Not Implemented");
-        case SC_NOT_MODIFIED:
-            return ("Not Modified");
-        case SC_PARTIAL_CONTENT:
-            return ("Partial Content");
-        case SC_PAYMENT_REQUIRED:
-            return ("Payment Required");
-        case SC_PRECONDITION_FAILED:
-            return ("Precondition Failed");
-        case SC_PROXY_AUTHENTICATION_REQUIRED:
-            return ("Proxy Authentication Required");
-        case SC_REQUEST_ENTITY_TOO_LARGE:
-            return ("Request Entity Too Large");
-        case SC_REQUEST_TIMEOUT:
-            return ("Request Timeout");
-        case SC_REQUEST_URI_TOO_LONG:
-            return ("Request URI Too Long");
-        case SC_REQUESTED_RANGE_NOT_SATISFIABLE:
-            return ("Requested Range Not Satisfiable");
-        case SC_RESET_CONTENT:
-            return ("Reset Content");
-        case SC_SEE_OTHER:
-            return ("See Other");
-        case SC_SERVICE_UNAVAILABLE:
-            return ("Service Unavailable");
-        case SC_SWITCHING_PROTOCOLS:
-            return ("Switching Protocols");
-        case SC_UNAUTHORIZED:
-            return ("Unauthorized");
-        case SC_UNSUPPORTED_MEDIA_TYPE:
-            return ("Unsupported Media Type");
-        case SC_USE_PROXY:
-            return ("Use Proxy");
-        case 207:       // WebDAV
-            return ("Multi-Status");
-        case 422:       // WebDAV
-            return ("Unprocessable Entity");
-        case 423:       // WebDAV
-            return ("Locked");
-        case 507:       // WebDAV
-            return ("Insufficient Storage");
-        default:
-            return ("HTTP Response Status " + status);
-        }
-
-    }
 
 
 
@@ -348,7 +127,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         super.reset();
         cookies.clear();
         headers.clear();
-        message = null;
+//        message = null;
         status = HttpServletResponse.SC_OK;
 
     }
@@ -478,9 +257,9 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
             return;     // Ignore any call from an included servlet
 
         synchronized (headers) {
-            ArrayList values = (ArrayList) headers.get(name);
+            List<String> values = headers.get(name);
             if (values == null) {
-                values = new ArrayList();
+                values = new ArrayList<String>();
                 headers.put(name, values);
             }
             values.add(value);
@@ -591,7 +370,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      */
     public void sendError(int status) throws IOException {
 
-        sendError(status, getStatusMessage(status));
+//        sendError(status, getStatusMessage(status));
 
     }
 
@@ -620,7 +399,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
 
         // Record the status code and message.
         this.status = status;
-        this.message = message;
+//        this.message = message;
 
         // Clear any data content that has been buffered
         resetBuffer();
@@ -708,7 +487,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (included)
             return;     // Ignore any call from an included servlet
 
-        ArrayList values = new ArrayList();
+        ArrayList<String> values = new ArrayList<String>();
         values.add(value);
         synchronized (headers) {
             headers.put(name, values);
@@ -757,7 +536,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      */
     public void setStatus(int status) {
 
-        setStatus(status, getStatusMessage(status));
+//        setStatus(status, getStatusMessage(status));
 
     }
 
@@ -778,7 +557,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
             return;     // Ignore any call from an included servlet
 
         this.status = status;
-        this.message = message;
+//        this.message = message;
 
     }
 

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-
-package org.apache.commons.messagelet.impl;
+package tabou.http;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -34,7 +33,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.collections.iterators.IteratorEnumeration;
+//import org.apache.commons.collections.iterators.IteratorEnumeration;
 
 /**
  * Based on the HttpRequestBase code from Catalina.
@@ -157,225 +156,13 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     }
 
 
-    /**
-     * Add a Cookie to the set of Cookies associated with this Request.
-     *
-     * @param cookie The new cookie
-     */
-    public void addCookie(Cookie cookie) {
-
-        synchronized (cookies) {
-            cookies.add(cookie);
-        }
-
-    }
-
-
-    /**
-     * Add a Header to the set of Headers associated with this Request.
-     *
-     * @param name The new header name
-     * @param value The new header value
-     */
-    public void addHeader(String name, String value) {
-
-        name = name.toLowerCase();
-        synchronized (headers) {
-            ArrayList values = (ArrayList) headers.get(name);
-            if (values == null) {
-                values = new ArrayList();
-                headers.put(name, values);
-            }
-            values.add(value);
-        }
-
-    }
-
-
-    /**
-     * Clear the collection of Cookies associated with this Request.
-     */
-    public void clearCookies() {
-
-        synchronized (cookies) {
-            cookies.clear();
-        }
-
-    }
-
-
-    /**
-     * Clear the collection of Headers associated with this Request.
-     */
-    public void clearHeaders() {
-
-        headers.clear();
-
-    }
-
-
-
-
-    /**
-     * Set the authentication type used for this request, if any; otherwise
-     * set the type to <code>null</code>.  Typical values are "BASIC",
-     * "DIGEST", or "SSL".
-     *
-     * @param authType The authentication type used
-     */
-    public void setAuthType(String authType) {
-
-        this.authType = authType;
-
-    }
-
-
-    /**
-     * Set the context path for this Request.  This will normally be called
-     * when the associated Context is mapping the Request to a particular
-     * Wrapper.
-     *
-     * @param path The context path
-     */
-    public void setContextPath(String path) {
-
-        if (path == null)
-            this.contextPath = "";
-        else
-            this.contextPath = path;
-
-    }
-
-
-    /**
-     * Set the HTTP request method used for this Request.
-     *
-     * @param method The request method
-     */
-    public void setMethod(String method) {
-
-        this.method = method;
-
-    }
-
-
-    /**
-     * Set the path information for this Request.  This will normally be called
-     * when the associated Context is mapping the Request to a particular
-     * Wrapper.
-     *
-     * @param path The path information
-     */
-    public void setPathInfo(String path) {
-
-        this.pathInfo = path;
-
-    }
-
-
-    /**
-     * Set the query string for this Request.  This will normally be called
-     * by the HTTP Connector, when it parses the request headers.
-     *
-     * @param query The query string
-     */
-    public void setQueryString(String query) {
-
-        this.queryString = query;
-        this.parameters = null;
-
-    }
-
-
-    /**
-     * Set a flag indicating whether or not the requested session ID for this
-     * request came in through a cookie.  This is normally called by the
-     * HTTP Connector, when it parses the request headers.
-     *
-     * @param flag The new flag
-     */
-    public void setRequestedSessionCookie(boolean flag) {
-
-        this.requestedSessionCookie = flag;
-
-    }
-
-
-    /**
-     * Set the requested session ID for this request.  This is normally called
-     * by the HTTP Connector, when it parses the request headers.
-     *
-     * @param id The new session id
-     */
-    public void setRequestedSessionId(String id) {
-
-        this.requestedSessionId = id;
-
-    }
-
-
-    /**
-     * Set a flag indicating whether or not the requested session ID for this
-     * request came in through a URL.  This is normally called by the
-     * HTTP Connector, when it parses the request headers.
-     *
-     * @param flag The new flag
-     */
-    public void setRequestedSessionURL(boolean flag) {
-
-        this.requestedSessionURL = flag;
-
-    }
-
-
-    /**
-     * Set the unparsed request URI for this Request.  This will normally
-     * be called by the HTTP Connector, when it parses the request headers.
-     *
-     * @param uri The request URI
-     */
-    public void setRequestURI(String uri) {
-
-        this.requestURI = uri;
-
-    }
-
-
-    /**
-     * Set the servlet path for this Request.  This will normally be called
-     * when the associated Context is mapping the Request to a particular
-     * Wrapper.
-     *
-     * @param path The servlet path
-     */
-    public void setServletPath(String path) {
-
-        this.servletPath = path;
-
-    }
-
-
-    /**
-     * Set the Principal who has been authenticated for this Request.  This
-     * value is also used to calculate the value to be returned by the
-     * <code>getRemoteUser()</code> method.
-     *
-     * @param principal The user Principal
-     */
-    public void setUserPrincipal(Principal principal) {
-
-        this.userPrincipal = principal;
-
-    }
-
-
-
     // --------------------------------------------- HttpServletRequest Methods
 
 
     /**
      * Return the authentication type used for this Request.
      */
+    @Override
     public String getAuthType() {
 
         return (authType);
@@ -387,6 +174,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return the portion of the request URI used to select the Context
      * of the Request.
      */
+    @Override
     public String getContextPath() {
 
         return (contextPath);
@@ -397,13 +185,14 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the set of Cookies received with this Request.
      */
+    @Override
     public Cookie[] getCookies() {
 
         synchronized (cookies) {
             if (cookies.size() < 1)
                 return (null);
             Cookie results[] = new Cookie[cookies.size()];
-            return ((Cookie[]) cookies.toArray(results));
+            return (Cookie[]) cookies.toArray(results);
         }
 
     }
@@ -418,6 +207,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @exception IllegalArgumentException if the specified header value
      *  cannot be converted to a date
      */
+    @Override
     public long getDateHeader(String name) {
 
         String value = getHeader(name);
@@ -448,6 +238,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      *
      * @param name Name of the requested header
      */
+    @Override
     public String getHeader(String name) {
 
         name = name.toLowerCase();
@@ -468,15 +259,18 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      *
      * @param name Name of the requested header
      */
+    @Override
     public Enumeration getHeaders(String name) {
 
         name = name.toLowerCase();
         synchronized (headers) {
             ArrayList values = (ArrayList) headers.get(name);
             if (values != null)
-                return (new IteratorEnumeration( values.iterator() ));
+//                return (new IteratorEnumeration( values.iterator() ));
+return null;
             else
-                return (new IteratorEnumeration( Collections.EMPTY_LIST.iterator() ));
+//                return (new IteratorEnumeration( Collections.EMPTY_LIST.iterator() ));
+return null;
         }
 
     }
@@ -485,10 +279,12 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the names of all headers received with this request.
      */
+    @Override
     public Enumeration getHeaderNames() {
 
         synchronized (headers) {
-            return (new IteratorEnumeration( headers.keySet().iterator() ));
+//            return (new IteratorEnumeration( headers.keySet().iterator() ));
+return null;
         }
 
     }
@@ -503,6 +299,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @exception IllegalArgumentException if the specified header value
      *  cannot be converted to an integer
      */
+    @Override
     public int getIntHeader(String name) {
 
         String value = getHeader(name);
@@ -517,6 +314,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the HTTP request method used in this Request.
      */
+    @Override
     public String getMethod() {
 
         return (method);
@@ -533,16 +331,18 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @return A <code>Map</code> containing parameter names as keys
      *  and parameter values as map values.
      */
+    @Override
     public Map getParameterMap() {
         if ( parameters == null ) {
             parameters = new HashMap();
             if ( queryString != null ) {
-                try {
-                    RequestUtil.parseParameters(parameters, queryString, getCharacterEncoding());
-                }
-                catch (UnsupportedEncodingException e) {
-                    servletContext.log( "Could not parse query string: " + queryString, e);
-                }
+//                try {
+//                    RequestUtil.parseParameters(parameters, queryString, getCharacterEncoding());
+//                }
+//                catch (UnsupportedEncodingException e) {
+//                    servletContext.log( "Could not parse query string: " + queryString, e);
+//                }
+return null;
             }
         }
         return parameters;
@@ -551,6 +351,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the path information associated with this Request.
      */
+    @Override
     public String getPathInfo() {
 
         return (pathInfo);
@@ -562,6 +363,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return the extra path information for this request, translated
      * to a real path.
      */
+    @Override
     public String getPathTranslated() {
 
         if (pathInfo == null)
@@ -575,6 +377,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the query string associated with this request.
      */
+    @Override
     public String getQueryString() {
 
         return (queryString);
@@ -586,6 +389,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return the name of the remote user that has been authenticated
      * for this Request.
      */
+    @Override
     public String getRemoteUser() {
 
         if (userPrincipal != null)
@@ -599,6 +403,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the session identifier included in this request, if any.
      */
+    @Override
     public String getRequestedSessionId() {
 
         return (requestedSessionId);
@@ -609,6 +414,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the request URI for this request.
      */
+    @Override
     public String getRequestURI() {
 
         return (requestURI);
@@ -632,6 +438,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @return A <code>StringBuffer</code> object containing the
      *  reconstructed URL
      */
+    @Override
     public StringBuffer getRequestURL() {
 
         StringBuffer url = new StringBuffer();
@@ -659,6 +466,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return the portion of the request URI used to select the servlet
      * that will process this request.
      */
+    @Override
     public String getServletPath() {
 
         return (servletPath);
@@ -670,6 +478,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return the session associated with this Request, creating one
      * if necessary.
      */
+    @Override
     public HttpSession getSession() {
 
         return (getSession(true));
@@ -683,6 +492,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      *
      * @param create Create a new session if one does not exist
      */
+    @Override
     public HttpSession getSession(boolean create) {
         // Return the current session if it exists and is valid
         if ((session != null) && !session.isValid())
@@ -699,6 +509,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return <code>true</code> if the session identifier included in this
      * request came from a cookie.
      */
+    @Override
     public boolean isRequestedSessionIdFromCookie() {
 
         if (requestedSessionId != null)
@@ -713,6 +524,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return <code>true</code> if the session identifier included in this
      * request came from the request URI.
      */
+    @Override
     public boolean isRequestedSessionIdFromURL() {
 
         if (requestedSessionId != null)
@@ -730,6 +542,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>isRequestedSessionIdFromURL()</code> instead.
      */
+    @Override
     public boolean isRequestedSessionIdFromUrl() {
 
         return (isRequestedSessionIdFromURL());
@@ -741,6 +554,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * Return <code>true</code> if the session identifier included in this
      * request identifies a valid session.
      */
+    @Override
     public boolean isRequestedSessionIdValid() {
         return false;
 
@@ -753,6 +567,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      *
      * @param role Role name to be validated
      */
+    @Override
     public boolean isUserInRole(String role) {  
         return false;
     }
@@ -761,6 +576,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * Return the principal that has been authenticated for this Request.
      */
+    @Override
     public Principal getUserPrincipal() {
 
         return (userPrincipal);

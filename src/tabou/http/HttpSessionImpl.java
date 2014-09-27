@@ -15,7 +15,7 @@
  */
 
 
-package org.apache.commons.messagelet.impl;
+package tabou.http;
 
 
 import java.beans.PropertyChangeSupport;
@@ -38,7 +38,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionContext;
 import javax.servlet.http.HttpSessionEvent;
 
-import org.apache.commons.collections.iterators.IteratorEnumeration;
+//import org.apache.commons.collections.iterators.IteratorEnumeration;
 
 /**
  * Based on the Catalina StandardSession class.
@@ -672,7 +672,8 @@ public class HttpSessionImpl implements HttpSession, Serializable {
         }
 
         synchronized (attributes) {
-            return (new IteratorEnumeration(attributes.keySet().iterator()));
+//            return (new IteratorEnumeration(attributes.keySet().iterator()));
+return null;
         }
 
     }
