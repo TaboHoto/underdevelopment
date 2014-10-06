@@ -61,7 +61,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
     /**
      * The set of cookies associated with this Request.
      */
-    protected ArrayList cookies = new ArrayList();
+    protected ArrayList<Cookie> cookies = new ArrayList<Cookie>();
 
 
     /**
@@ -192,7 +192,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
             if (cookies.size() < 1)
                 return (null);
             Cookie results[] = new Cookie[cookies.size()];
-            return (Cookie[]) cookies.toArray(results);
+            return cookies.toArray(results);
         }
 
     }

@@ -72,7 +72,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
     /**
      * The collection of user data attributes associated with this Session.
      */
-    private HashMap attributes = new HashMap();
+    private HashMap<String,Object> attributes = new HashMap<String,Object>();
 
 
     /**
@@ -150,7 +150,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      * and event listeners.  <b>IMPLEMENTATION NOTE:</b> This object is
      * <em>not</em> saved and restored across session serializations!
      */
-    private transient HashMap notes = new HashMap();
+    private transient HashMap<String,Object> notes = new HashMap<String,Object>();
 
 
     /**
@@ -370,224 +370,6 @@ public class HttpSessionImpl implements HttpSession, Serializable {
     }
 
 
-    // ------------------------------------------------- Session Public Methods
-
-
-    /**
-     * Update the accessed time information for this session.  This method
-     * should be called by the context when a request comes in for a particular
-     * session, even if the application does not reference it.
-     */
-    public void access() {
-
-        this.isNew = false;
-        this.lastAccessedTime = this.thisAccessedTime;
-        this.thisAccessedTime = System.currentTimeMillis();
-
-    }
-
-
-
-    /**
-     * Perform the internal processing required to invalidate this session,
-     * without triggering an exception if the session has already expired.
-     */
-    public void expire() {
-
-        // Mark this session as "being expired" if needed
-        if (expiring)
-            return;
-        expiring = true;
-        setValid(false);
-
-        // Unbind any objects associated with this session
-        String keys[] = keys();
-        for (int i = 0; i < keys.length; i++)
-            removeAttribute(keys[i]);
-
-        // Notify interested session event listeners
-        //fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
-
-        // We have completed expire of this session
-        expiring = false;
-    }
-
-
-    /**
-     * Perform the internal processing required to passivate
-     * this session.
-     */
-    public void passivate() {
-
-        // Notify ActivationListeners
-        HttpSessionEvent event = null;
-        String keys[] = keys();
-        for (int i = 0; i < keys.length; i++) {
-            Object attribute = getAttribute(keys[i]);
-            if (attribute instanceof HttpSessionActivationListener) {
-                if (event == null)
-                    event = new HttpSessionEvent(this);
-                // FIXME: Should we catch throwables?
-                ((HttpSessionActivationListener)attribute).sessionWillPassivate(event);
-            }
-        }
-
-    }
-
-
-    /**
-     * Perform internal processing required to activate this
-     * session.
-     */
-    public void activate() {
-
-        // Notify ActivationListeners
-        HttpSessionEvent event = null;
-        String keys[] = keys();
-        for (int i = 0; i < keys.length; i++) {
-            Object attribute = getAttribute(keys[i]);
-            if (attribute instanceof HttpSessionActivationListener) {
-                if (event == null)
-                    event = new HttpSessionEvent(this);
-                // FIXME: Should we catch throwables?
-                ((HttpSessionActivationListener)attribute).sessionDidActivate(event);
-            }
-        }
-
-    }
-
-
-    /**
-     * Return the object bound with the specified name to the internal notes
-     * for this session, or <code>null</code> if no such binding exists.
-     *
-     * @param name Name of the note to be returned
-     */
-    public Object getNote(String name) {
-
-        synchronized (notes) {
-            return (notes.get(name));
-        }
-
-    }
-
-
-    /**
-     * Return an Iterator containing the String names of all notes bindings
-     * that exist for this session.
-     */
-    public Iterator getNoteNames() {
-
-        synchronized (notes) {
-            return (notes.keySet().iterator());
-        }
-
-    }
-
-
-    /**
-     * Release all object references, and initialize instance variables, in
-     * preparation for reuse of this object.
-     */
-    public void recycle() {
-
-        // Reset the instance variables associated with this Session
-        attributes.clear();
-        setAuthType(null);
-        creationTime = 0L;
-        expiring = false;
-        id = null;
-        lastAccessedTime = 0L;
-        maxInactiveInterval = -1;
-        setPrincipal(null);
-        isNew = false;
-        isValid = false;
-    }
-
-
-    /**
-     * Remove any object bound to the specified name in the internal notes
-     * for this session.
-     *
-     * @param name Name of the note to be removed
-     */
-    public void removeNote(String name) {
-
-        synchronized (notes) {
-            notes.remove(name);
-        }
-
-    }
-
-
-
-    /**
-     * Bind an object to a specified name in the internal notes associated
-     * with this session, replacing any existing binding for this name.
-     *
-     * @param name Name to which the object should be bound
-     * @param value Object to be bound to the specified name
-     */
-    public void setNote(String name, Object value) {
-
-        synchronized (notes) {
-            notes.put(name, value);
-        }
-
-    }
-
-
-    /**
-     * Return a string representation of this object.
-     */
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("StandardSession[");
-        sb.append(id);
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
-
-    // ------------------------------------------------ Session Package Methods
-
-
-    /**
-     * Read a serialized version of the contents of this session object from
-     * the specified object input stream, without requiring that the
-     * StandardSession itself have been serialized.
-     *
-     * @param stream The object input stream to read from
-     *
-     * @exception ClassNotFoundException if an unknown class is specified
-     * @exception IOException if an input/output error occurs
-     */
-    void readObjectData(ObjectInputStream stream)
-        throws ClassNotFoundException, IOException {
-
-        readObject(stream);
-
-    }
-
-
-    /**
-     * Write a serialized version of the contents of this session object to
-     * the specified object output stream, without requiring that the
-     * StandardSession itself have been serialized.
-     *
-     * @param stream The object output stream to write to
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    void writeObjectData(ObjectOutputStream stream)
-        throws IOException {
-
-        writeObject(stream);
-
-    }
-
 
     // ------------------------------------------------- HttpSession Properties
 
@@ -599,6 +381,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public long getCreationTime() {
 
         if (!isValid) {
@@ -613,6 +396,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
     /**
      * Return the ServletContext to which this session belongs.
      */
+    @Override
     public ServletContext getServletContext() {
         return servletContext;
 
@@ -626,10 +410,9 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      *  replacement.  It will be removed in a future version of the
      *  Java Servlet API.
      */
+    @Override
     public HttpSessionContext getSessionContext() {
-
         return null;
-
     }
 
 
@@ -645,6 +428,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public Object getAttribute(String name) {
 
         if (!isValid) {
@@ -665,6 +449,7 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public Enumeration getAttributeNames() {
 
         if (!isValid) {
@@ -691,6 +476,7 @@ return null;
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>getAttribute()</code>
      */
+    @Override
     public Object getValue(String name) {
 
         return (getAttribute(name));
@@ -708,6 +494,7 @@ return null;
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>getAttributeNames()</code>
      */
+    @Override
     public String[] getValueNames() {
 
         if (!isValid) {
@@ -725,6 +512,7 @@ return null;
      * @exception IllegalStateException if this method is called on
      *  an invalidated session
      */
+    @Override
     public void invalidate() {
 
         if (!isValid) {
@@ -732,7 +520,7 @@ return null;
         }
 
         // Cause this session to expire
-        expire();
+//        expire();
 
     }
 
@@ -747,6 +535,7 @@ return null;
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public boolean isNew() {
 
         if (!isValid) {
@@ -776,6 +565,7 @@ return null;
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>setAttribute()</code>
      */
+    @Override
     public void putValue(String name, Object value) {
 
         setAttribute(name, value);
@@ -797,6 +587,7 @@ return null;
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public void removeAttribute(String name) {
 
         // Validate our current state
@@ -816,38 +607,6 @@ return null;
                 return;
             }
         }
-/*
-        // Call the valueUnbound() method if necessary
-        HttpSessionBindingEvent event =
-          new HttpSessionBindingEvent((HttpSession) this, name, value);
-        if ((value != null) &&
-            (value instanceof HttpSessionBindingListener))
-            ((HttpSessionBindingListener) value).valueUnbound(event);
-
-        // Notify interested application event listeners
-        StandardContext context = (StandardContext) manager.getContainer();
-        Object listeners[] = context.getApplicationListeners();
-        if (listeners == null)
-            return;
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof HttpSessionAttributeListener))
-                continue;
-            HttpSessionAttributeListener listener =
-                (HttpSessionAttributeListener) listeners[i];
-            try {
-                context.fireContainerEvent("beforeSessionAttributeRemoved",
-                                           listener);
-                listener.attributeRemoved(event);
-                context.fireContainerEvent("afterSessionAttributeRemoved",
-                                           listener);
-            } catch (Throwable t) {
-                context.fireContainerEvent("afterSessionAttributeRemoved",
-                                           listener);
-                // FIXME - should we do anything besides log these?
-                log( "Exception firing attribute event", t);
-            }
-        }
-*/
     }
 
 
@@ -868,6 +627,7 @@ return null;
      * @deprecated As of Version 2.2, this method is replaced by
      *  <code>removeAttribute()</code>
      */
+    @Override
     public void removeValue(String name) {
 
         removeAttribute(name);
@@ -892,6 +652,7 @@ return null;
      * @exception IllegalStateException if this method is called on an
      *  invalidated session
      */
+    @Override
     public void setAttribute(String name, Object value) {
 
         // Name cannot be null
@@ -938,44 +699,6 @@ return null;
                 ((HttpSession) this, name, value);
         if (value instanceof HttpSessionBindingListener)
             ((HttpSessionBindingListener) value).valueBound(event);
-
-        // Notify interested application event listeners
-/*        
-        StandardContext context = (StandardContext) manager.getContainer();
-        Object listeners[] = context.getApplicationListeners();
-        if (listeners == null)
-            return;
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof HttpSessionAttributeListener))
-                continue;
-            HttpSessionAttributeListener listener =
-                (HttpSessionAttributeListener) listeners[i];
-            try {
-                if (unbound != null) {
-                    context.fireContainerEvent("beforeSessionAttributeReplaced",
-                                               listener);
-                    listener.attributeReplaced(event);
-                    context.fireContainerEvent("afterSessionAttributeReplaced",
-                                               listener);
-                } else {
-                    context.fireContainerEvent("beforeSessionAttributeAdded",
-                                               listener);
-                    listener.attributeAdded(event);
-                    context.fireContainerEvent("afterSessionAttributeAdded",
-                                               listener);
-                }
-            } catch (Throwable t) {
-                if (unbound != null)
-                    context.fireContainerEvent("afterSessionAttributeReplaced",
-                                               listener);
-                else
-                    context.fireContainerEvent("afterSessionAttributeAdded",
-                                               listener);
-                // FIXME - should we do anything besides log these?
-                log( "Exception firing attribute event", t);
-            }
-        }
-*/
     }
 
 
@@ -1012,7 +735,7 @@ return null;
 
         // Deserialize the attribute count and attribute values
         if (attributes == null)
-            attributes = new HashMap();
+            attributes = new HashMap<String,Object>();
         int n = ((Integer) stream.readObject()).intValue();
         boolean isValidSave = isValid;
         isValid = true;
@@ -1067,9 +790,9 @@ return null;
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
-        ArrayList saveNames = new ArrayList();
-        ArrayList saveValues = new ArrayList();
-        ArrayList unbinds = new ArrayList();
+        ArrayList<String> saveNames = new ArrayList<String>();
+        ArrayList<Object> saveValues = new ArrayList<Object>();
+        ArrayList<String> unbinds = new ArrayList<String>();
         for (int i = 0; i < keys.length; i++) {
             Object value = null;
             synchronized (attributes) {
@@ -1116,28 +839,6 @@ return null;
     // -------------------------------------------------------- Private Methods
 
 
-    /**
-     * Notify all session event listeners that a particular event has
-     * occurred for this Session.  The default implementation performs
-     * this notification synchronously using the calling thread.
-     *
-     * @param type Event type
-     * @param data Event data
-     */
-    public void fireSessionEvent(String type, Object data) {
-/*    
-        if (listeners.size() < 1)
-            return;
-        SessionEvent event = new SessionEvent(this, type, data);
-        SessionListener list[] = new SessionListener[0];
-        synchronized (listeners) {
-            list = (SessionListener[]) listeners.toArray(list);
-        }
-        for (int i = 0; i < list.length; i++)
-            ((SessionListener) list[i]).sessionEvent(event);
-*/
-    }
-
 
     /**
      * Return the names of all currently defined session attributes
@@ -1148,7 +849,7 @@ return null;
 
         String results[] = new String[0];
         synchronized (attributes) {
-            return ((String[]) attributes.keySet().toArray(results));
+            return (attributes.keySet().toArray(results));
         }
 
     }
