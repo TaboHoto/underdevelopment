@@ -38,10 +38,6 @@ import javax.servlet.ServletResponse;
 
 public class ServletResponseImpl implements ServletResponse {
 
-
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
      * The buffer through which all of our output bytes are passed.
      */
@@ -83,31 +79,16 @@ public class ServletResponseImpl implements ServletResponse {
      */
     protected String encoding = null;
 
-
-    /**
-     * Are we currently processing inside a RequestDispatcher.include()?
-     */
-    protected boolean included = false;
-
-
     /**
      * The Locale associated with this Response.
      */
     protected Locale locale = Locale.getDefault();
-
-
-    /**
-     * The output stream associated with this Response.
-     */
-    protected OutputStream output = null;
-
 
     /**
      * The ServletOutputStream that has been returned by
      * <code>getOutputStream()</code>, if any.
      */
     protected ServletOutputStream stream = null;
-
 
     /**
      * The PrintWriter that has been returned by
@@ -121,49 +102,9 @@ public class ServletResponseImpl implements ServletResponse {
      */
     protected boolean error = false;
 
-
-    // ------------------------------------------------------------- Properties
-
-
-
-    /**
-     * Return the number of bytes actually written to the output stream.
-     */
-    public int getContentCount() {
-
-        return (this.contentCount);
-
+    public void setStream(ServletOutputStream stream){
+        this.stream = stream;
     }
-
-
-
-
-    /**
-     * Return the output stream associated with this Response.
-     */
-    public OutputStream getStream() {
-
-        return (this.output);
-
-    }
-
-
-    /**
-     * Set the output stream associated with this Response.
-     *
-     * @param stream The new output stream
-     */
-    public void setStream(OutputStream stream) {
-
-        this.output = stream;
-
-    }
-
-
-
-    // --------------------------------------------------------- Public Methods
-
-
 
     // ------------------------------------------------ ServletResponse Methods
 
@@ -173,33 +114,26 @@ public class ServletResponseImpl implements ServletResponse {
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void flushBuffer() throws IOException {
-
-        committed = true;
-        if (bufferCount > 0) {
-            try {
-                output.write(buffer, 0, bufferCount);
-            } finally {
-                bufferCount = 0;
-            }
-        }
-
+        stream.flush();
     }
 
 
     /**
      * Return the actual buffer size used for this Response.
      */
+    @Override
     public int getBufferSize() {
 
         return (buffer.length);
 
     }
 
-
     /**
      * Return the character encoding used for this Response.
      */
+    @Override
     public String getCharacterEncoding() {
 
         if (encoding == null)
@@ -209,7 +143,6 @@ public class ServletResponseImpl implements ServletResponse {
 
     }
 
-
     /**
      * Return the servlet output stream associated with this Response.
      *
@@ -217,31 +150,18 @@ public class ServletResponseImpl implements ServletResponse {
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
-
-        if (writer != null) {
-            throw new IllegalStateException( "getWriter() has already been called" );
-        }
-
-//        if (stream == null)
-//            stream = createOutputStream();
-/*        
-        ((ResponseStream) stream).setCommit(true);
-*/
-        return (stream);
-
+        return stream;
     }
-
 
     /**
      * Return the Locale assigned to this response.
      */
+    @Override
     public Locale getLocale() {
-
-        return (locale);
-
+        return locale;
     }
-
 
     /**
      * Return the writer associated with this Response.
@@ -250,41 +170,26 @@ public class ServletResponseImpl implements ServletResponse {
      *  already been called for this response
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public PrintWriter getWriter() throws IOException {
 
         if (writer != null)
             return (writer);
-
         if (stream != null) {
             throw new IllegalStateException( "getOutputStream() has already been called" );
         }
-
-//        stream = createOutputStream();
-        
         // a slight hack which slightly breaks the Servlet contract...
         // see commented out section below for what it should be...
-        writer =  new PrintWriter( new OutputStreamWriter(stream, getCharacterEncoding()) );
-        return writer;
-        
-/*        
-        ((ResponseStream) stream).setCommit(false);
-        OutputStreamWriter osr =
-          new OutputStreamWriter(stream, getCharacterEncoding());
-        writer = new ResponseWriter(osr, (ResponseStream) stream);
-        return (writer);
-*/
+        return new PrintWriter( new OutputStreamWriter(stream, getCharacterEncoding()) ); 
     }
-
 
     /**
      * Has the output of this response already been committed?
      */
+    @Override
     public boolean isCommitted() {
-
-        return (committed);
-
+        return committed;
     }
-
 
     /**
      * Clear any content written to the buffer.
@@ -292,19 +197,12 @@ public class ServletResponseImpl implements ServletResponse {
      * @exception IllegalStateException if this response has already
      *  been committed
      */
+    @Override
     public void reset() {
 
         if (committed) {
             throw new IllegalStateException( "response has already been committed" );
         }
-        
-        if (included)
-            return;     // Ignore any call from an included servlet
-
-/*        
-        if (stream != null)
-            ((ResponseStream) stream).reset();
-*/
         bufferCount = 0;
         contentLength = -1;
         contentType = null;
@@ -318,6 +216,7 @@ public class ServletResponseImpl implements ServletResponse {
      * @exception IllegalStateException if the response has already
      *  been committed
      */
+    @Override
     public void resetBuffer() {
 
         if (committed) {
@@ -328,7 +227,6 @@ public class ServletResponseImpl implements ServletResponse {
 
     }
 
-
     /**
      * Set the buffer size to be used for this Response.
      *
@@ -337,6 +235,7 @@ public class ServletResponseImpl implements ServletResponse {
      * @exception IllegalStateException if this method is called after
      *  output has been committed for this response
      */
+    @Override
     public void setBufferSize(int size) {
 
         if (committed || (bufferCount > 0)) {
@@ -349,48 +248,34 @@ public class ServletResponseImpl implements ServletResponse {
 
     }
 
-
     /**
      * Set the content length (in bytes) for this Response.
      *
      * @param length The new content length
      */
+    @Override
     public void setContentLength(int length) {
 
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         this.contentLength = length;
 
     }
-
 
     /**
      * Set the content type for this Response.
      *
      * @param type The new content type
      */
+    @Override
     public void setContentType(String type) {
 
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         this.contentType = type;
-/*
-        if (type.indexOf(';') >= 0) {
-            encoding = RequestUtil.parseCharacterEncoding(type);
-            if (encoding == null)
-                encoding = "ISO-8859-1";
-        }
-*/
     }
-
 
     /**
      * Set the Locale that is appropriate for this response, including
@@ -398,22 +283,11 @@ public class ServletResponseImpl implements ServletResponse {
      *
      * @param locale The new locale
      */
+    @Override
     public void setLocale(Locale locale) {
-
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         this.locale = locale;
-/*        
-        if ((this.encoding == null) && (this.context != null)) {
-            CharsetMapper mapper = context.getCharsetMapper();
-            this.encoding = mapper.getCharset(locale);
-        }
-*/
     }
-
-
 }

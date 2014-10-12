@@ -66,13 +66,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
     protected HashMap<String,List<String>> headers = new HashMap<String,List<String>>();
 
 
-
-    /**
-     * The error message set by <code>sendError()</code>.
-     */
-//    protected String message = getStatusMessage(HttpServletResponse.SC_OK);
-
-
     /**
      * The HTTP status code associated with this Response.
      */
@@ -83,14 +76,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * The time zone with which to construct date headers.
      */
     protected static final TimeZone zone = TimeZone.getTimeZone("GMT");
-
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-
-
 
     // ------------------------------------------------ ServletResponse Methods
 
@@ -121,9 +106,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      */
     public void reset() {
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         super.reset();
         cookies.clear();
         headers.clear();
@@ -143,9 +125,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         super.setContentLength(length);
 
     }
@@ -162,9 +141,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         super.setContentType(type);
 
     }
@@ -180,9 +156,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
 
         if (isCommitted())
             return;
-
-        if (included)
-            return;     // Ignore any call from an included servlet
 
         super.setLocale(locale);
         String language = locale.getLanguage();
@@ -213,9 +186,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         synchronized (cookies) {
             cookies.add(cookie);
         }
@@ -234,9 +204,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         addHeader(name, format.format(new Date(value)));
 
     }
@@ -252,9 +219,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
 
         if (isCommitted())
             return;
-
-        if (included)
-            return;     // Ignore any call from an included servlet
 
         synchronized (headers) {
             List<String> values = headers.get(name);
@@ -278,9 +242,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
 
         if (isCommitted())
             return;
-
-        if (included)
-            return;     // Ignore any call from an included servlet
 
         addHeader(name, "" + value);
 
@@ -391,9 +352,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
             throw new IllegalStateException( "Cannot send error, already committed" );
         }
 
-        if (included) {
-            return;     // Ignore any call from an included servlet
-        }
 
         //setError();
 
@@ -439,9 +397,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted()) {
             throw new IllegalStateException( "Cannot send error, already committed" );
         }
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         // Clear any data content that has been buffered
         resetBuffer();
 
@@ -465,9 +420,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         setHeader(name, format.format(new Date(value)));
 
     }
@@ -483,9 +435,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
 
         if (isCommitted())
             return;
-
-        if (included)
-            return;     // Ignore any call from an included servlet
 
         ArrayList<String> values = new ArrayList<String>();
         values.add(value);
@@ -521,9 +470,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         if (isCommitted())
             return;
 
-        if (included)
-            return;     // Ignore any call from an included servlet
-
         setHeader(name, "" + value);
 
     }
@@ -552,9 +498,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *  parameter.
      */
     public void setStatus(int status, String message) {
-
-        if (included)
-            return;     // Ignore any call from an included servlet
 
         this.status = status;
 //        this.message = message;

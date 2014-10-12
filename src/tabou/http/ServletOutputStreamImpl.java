@@ -6,15 +6,14 @@ import javax.servlet.ServletOutputStream;
 
 public class ServletOutputStreamImpl extends ServletOutputStream {
     private OutputStream out;
-    @override
     public ServletOutputStreamImpl(OutputStream out) {
         this.out = out;
     }
-    @override
+    @Override
     public void write(int b) throws IOException {
         out.write(b);
     }
-    @override
+    @Override
     public void flush() throws IOException {
         out.flush();
     }
