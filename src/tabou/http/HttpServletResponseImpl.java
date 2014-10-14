@@ -46,7 +46,6 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      */
     protected ArrayList<Cookie> cookies = new ArrayList<Cookie>();
 
-
     /**
      * The date format we will use for creating date headers.
      */
@@ -56,21 +55,10 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
     };
 
-
-    /**
-     * The HTTP headers explicitly added via addHeader(), but not including
-     * those to be added with setContentLength(), setContentType(), and so on.
-     * This collection is keyed by the header name, and the elements are
-     * ArrayLists containing the associated values that have been set.
-     */
-    protected HashMap<String,List<String>> headers = new HashMap<String,List<String>>();
-
-
     /**
      * The HTTP status code associated with this Response.
      */
     protected int status = HttpServletResponse.SC_OK;
-
 
     /**
      * The time zone with which to construct date headers.
@@ -86,6 +74,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void flushBuffer() throws IOException {
 /*
         if (!isCommitted()) {
@@ -104,6 +93,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @exception IllegalStateException if this response has already
      *  been committed
      */
+    @Override
     public void reset() {
 
         super.reset();
@@ -120,6 +110,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param length The new content length
      */
+    @Override
     public void setContentLength(int length) {
 
         if (isCommitted())
@@ -136,6 +127,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param type The new content type
      */
+    @Override
     public void setContentType(String type) {
 
         if (isCommitted())
@@ -152,6 +144,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param locale The new locale
      */
+    @Override
     public void setLocale(Locale locale) {
 
         if (isCommitted())
@@ -181,6 +174,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param cookie Cookie to be added
      */
+    @Override
     public void addCookie(Cookie cookie) {
 
         if (isCommitted())
@@ -199,6 +193,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Date value to be set
      */
+    @Override
     public void addDateHeader(String name, long value) {
 
         if (isCommitted())
@@ -215,6 +210,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Value to be set
      */
+    @Override
     public void addHeader(String name, String value) {
 
         if (isCommitted())
@@ -238,6 +234,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Integer value to be set
      */
+    @Override
     public void addIntHeader(String name, int value) {
 
         if (isCommitted())
@@ -253,6 +250,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param name Name of the header to check
      */
+    @Override
     public boolean containsHeader(String name) {
 
         synchronized (headers) {
@@ -268,6 +266,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param url URL to be encoded
      */
+    @Override
     public String encodeRedirectURL(String url) {
 
         return (url);
@@ -284,6 +283,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeRedirectURL()</code> instead.
      */
+    @Override
     public String encodeRedirectUrl(String url) {
 
         return (encodeRedirectURL(url));
@@ -297,6 +297,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param url URL to be encoded
      */
+    @Override
     public String encodeURL(String url) {
         
         return (url);
@@ -312,6 +313,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeURL()</code> instead.
      */
+    @Override
     public String encodeUrl(String url) {
 
         return (encodeURL(url));
@@ -329,6 +331,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int status) throws IOException {
 
 //        sendError(status, getStatusMessage(status));
@@ -346,6 +349,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendError(int status, String message) throws IOException {
 
         if (isCommitted()) {
@@ -392,6 +396,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *  already been committed
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void sendRedirect(String location) throws IOException {
 
         if (isCommitted()) {
@@ -415,6 +420,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Date value to be set
      */
+    @Override
     public void setDateHeader(String name, long value) {
 
         if (isCommitted())
@@ -431,6 +437,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Value to be set
      */
+    @Override
     public void setHeader(String name, String value) {
 
         if (isCommitted())
@@ -465,6 +472,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      * @param name Name of the header to set
      * @param value Integer value to be set
      */
+    @Override
     public void setIntHeader(String name, int value) {
 
         if (isCommitted())
@@ -480,6 +488,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *
      * @param status The new HTTP status
      */
+    @Override
     public void setStatus(int status) {
 
 //        setStatus(status, getStatusMessage(status));
@@ -497,6 +506,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      *  has been deprecated due to the ambiguous meaning of the message
      *  parameter.
      */
+    @Override
     public void setStatus(int status, String message) {
 
         this.status = status;

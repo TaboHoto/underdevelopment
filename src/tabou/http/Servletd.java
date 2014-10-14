@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.net.ServerSocket;
 import java.net.Socket;
 import tabou.log.TabouLog;
@@ -33,7 +34,7 @@ public class Servletd {
     public static void main(String[] args) throws Exception{
         TabouLog.init();
         int localPort = DEFAULT_PROXY_PORT;  /* port no       */
-        EchoHttpd echoHttpd = new EchoHttpd();
+        Servletd servletd = new Servletd();
         int argi = 0;
         for (; argi < args.length; argi++) {
             char[] chars = args[argi].toCharArray();
@@ -54,7 +55,7 @@ public class Servletd {
                 usage();
             }
         }
-        echoHttpd.accrpt(localPort);
+        servletd.accrpt(localPort);
     }
     public void accrpt(int localPort) throws IOException{
         this.serverSocket = new ServerSocket(localPort);
@@ -65,7 +66,7 @@ public class Servletd {
             try{
                 request(requestSocket);
             }catch(Exception e){
-                Log.warning(e.toString());
+                Log.log(Level.WARNING,e.toString(),e);
             }finally{
                 requestSocket.close();
             }
@@ -113,6 +114,7 @@ public class Servletd {
         servletOutputStream.write(RESPONSE);
         response.setStream(servletOutputStream);
         httpServlet.doGet(request,response);
+        response.getWriter().close();
         servletOutputStream.close();
         servletInputStream.close();
     }

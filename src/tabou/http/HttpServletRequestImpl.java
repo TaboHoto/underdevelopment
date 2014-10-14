@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -79,7 +80,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * The HTTP headers associated with this Request, keyed by name.  The
      * values are ArrayLists of the corresponding header values.
      */
-    protected HashMap headers = new HashMap();
+    protected HashMap<String,List<String>> headers = new HashMap<String,List<String>> ();
 
 
 
@@ -187,14 +188,10 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      */
     @Override
     public Cookie[] getCookies() {
-
-        synchronized (cookies) {
             if (cookies.size() < 1)
                 return (null);
             Cookie results[] = new Cookie[cookies.size()];
             return cookies.toArray(results);
-        }
-
     }
 
 
@@ -222,7 +219,7 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
         for (int i = 0; i < formats.length; i++) {
             try {
                 Date date = formats[i].parse(value);
-                return (date.getTime());
+                return date.getTime();
             } catch (ParseException e) {
                 ;
             }
@@ -240,18 +237,14 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      */
     @Override
     public String getHeader(String name) {
-
         name = name.toLowerCase();
-        synchronized (headers) {
-            ArrayList values = (ArrayList) headers.get(name);
-            if (values != null)
-                return ((String) values.get(0));
-            else
-                return (null);
-        }
-
+            List<String> values = headers.get(name);
+            if (values != null){
+                return values.get(0);
+            }else{
+                return null;
+            }
     }
-
 
     /**
      * Return all of the values of the specified header, if any; otherwise,
@@ -261,34 +254,24 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      */
     @Override
     public Enumeration getHeaders(String name) {
-
         name = name.toLowerCase();
-        synchronized (headers) {
-            ArrayList values = (ArrayList) headers.get(name);
+            List<String> values = headers.get(name);
             if (values != null)
 //                return (new IteratorEnumeration( values.iterator() ));
 return null;
             else
 //                return (new IteratorEnumeration( Collections.EMPTY_LIST.iterator() ));
 return null;
-        }
-
     }
-
 
     /**
      * Return the names of all headers received with this request.
      */
     @Override
     public Enumeration getHeaderNames() {
-
-        synchronized (headers) {
 //            return (new IteratorEnumeration( headers.keySet().iterator() ));
 return null;
-        }
-
     }
-
 
     /**
      * Return the value of the specified header as an integer, or -1 if there
@@ -301,13 +284,11 @@ return null;
      */
     @Override
     public int getIntHeader(String name) {
-
         String value = getHeader(name);
         if (value == null)
             return (-1);
         else
             return (Integer.parseInt(value));
-
     }
 
 
@@ -316,11 +297,8 @@ return null;
      */
     @Override
     public String getMethod() {
-
-        return (method);
-
+        return method;
     }
-
 
     /**
      * Returns a <code>Map</code> of the parameters of this request.
@@ -357,7 +335,6 @@ return null;
         return (pathInfo);
 
     }
-
 
     /**
      * Return the extra path information for this request, translated

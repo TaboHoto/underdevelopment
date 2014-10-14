@@ -23,6 +23,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -69,9 +73,12 @@ public class ServletResponseImpl implements ServletResponse {
 
 
     /**
-     * The content type associated with this Response.
+     * The HTTP headers explicitly added via addHeader(), but not including
+     * those to be added with setContentLength(), setContentType(), and so on.
+     * This collection is keyed by the header name, and the elements are
+     * ArrayLists containing the associated values that have been set.
      */
-    protected String contentType = null;
+    protected Map<String,List<String>> headers = new HashMap<String,List<String>>();
 
 
     /**
@@ -173,14 +180,16 @@ public class ServletResponseImpl implements ServletResponse {
     @Override
     public PrintWriter getWriter() throws IOException {
 
-        if (writer != null)
-            return (writer);
-        if (stream != null) {
-            throw new IllegalStateException( "getOutputStream() has already been called" );
+        if (this.writer != null){
+            return this.writer;
         }
+//        if (stream != null) {
+//            throw new IllegalStateException( "getOutputStream() has already been called" );
+//        }
         // a slight hack which slightly breaks the Servlet contract...
         // see commented out section below for what it should be...
-        return new PrintWriter( new OutputStreamWriter(stream, getCharacterEncoding()) ); 
+        this.writer = new PrintWriter( new OutputStreamWriter(stream, getCharacterEncoding()));
+        return this.writer;
     }
 
     /**
@@ -205,8 +214,7 @@ public class ServletResponseImpl implements ServletResponse {
         }
         bufferCount = 0;
         contentLength = -1;
-        contentType = null;
-
+        setContentType(null);
     }
 
 
@@ -256,9 +264,9 @@ public class ServletResponseImpl implements ServletResponse {
     @Override
     public void setContentLength(int length) {
 
-        if (isCommitted())
+        if (isCommitted()){
             return;
-
+        }
         this.contentLength = length;
 
     }
@@ -270,11 +278,16 @@ public class ServletResponseImpl implements ServletResponse {
      */
     @Override
     public void setContentType(String type) {
-
-        if (isCommitted())
+        if (isCommitted()){
             return;
-
-        this.contentType = type;
+        }
+        if(type == null){
+            headers.remove("CONTENT-TYPE");
+            return;
+        }
+        List<String> typeList = new ArrayList<String>();
+        typeList.add(type);
+        headers.put("CONTENT-TYPE",typeList);
     }
 
     /**
@@ -285,9 +298,9 @@ public class ServletResponseImpl implements ServletResponse {
      */
     @Override
     public void setLocale(Locale locale) {
-        if (isCommitted())
+        if (isCommitted()){
             return;
-
+        }
         this.locale = locale;
     }
 }
