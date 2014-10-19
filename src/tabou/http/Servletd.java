@@ -20,11 +20,6 @@ import javax.servlet.http.HttpServlet;
 
 public class Servletd {
     static private final int DEFAULT_PROXY_PORT = 8080;
-    static private final byte[] RESPONSE = (
-        "HTTP/1.0 200 OK\r\n" +
-        "Connection: close\r\n" +
-        "Content-type: text/plain\r\n" +
-        "\r\n").getBytes();
     private ServerSocket serverSocket;
 
     public static void usage() {
@@ -111,7 +106,7 @@ public class Servletd {
         ServletContext servletContext    = new ServletContextImpl();
         HttpServletRequestImpl request   = new HttpServletRequestImpl(servletContext);
         HttpServletResponseImpl response = new HttpServletResponseImpl();
-        servletOutputStream.write(RESPONSE);
+        response.setHeader("Connection","close");
         response.setStream(servletOutputStream);
         httpServlet.doGet(request,response);
         response.getWriter().close();

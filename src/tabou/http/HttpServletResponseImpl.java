@@ -81,8 +81,18 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
             sendHeaders();
         }
 */
+        StringBuilder headStr = new StringBuilder("HTTP/1.0 " + status + " OK\r\n");
+        for(String name : headers.keySet()){
+            for(String value : headers.get(name)){
+                headStr.append(name);
+                headStr.append(": ");
+                headStr.append(value);
+                headStr.append("\r\n");
+            }
+        }
+        headStr.append("\r\n");
+        getOutputStream().write(headStr.toString().getBytes());
         super.flushBuffer();
-
     }
 
 
@@ -252,11 +262,7 @@ public class HttpServletResponseImpl extends ServletResponseImpl implements Http
      */
     @Override
     public boolean containsHeader(String name) {
-
-        synchronized (headers) {
             return (headers.get(name) != null);
-        }
-
     }
 
 

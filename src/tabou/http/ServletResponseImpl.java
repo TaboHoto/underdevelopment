@@ -142,12 +142,10 @@ public class ServletResponseImpl implements ServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-
-        if (encoding == null)
-            return ("ISO-8859-1");
-        else
-            return (encoding);
-
+        if (encoding == null){
+            return "utf-8";
+        }
+        return encoding;
     }
 
     /**
@@ -188,6 +186,7 @@ public class ServletResponseImpl implements ServletResponse {
 //        }
         // a slight hack which slightly breaks the Servlet contract...
         // see commented out section below for what it should be...
+        flushBuffer(); //TODO
         this.writer = new PrintWriter( new OutputStreamWriter(stream, getCharacterEncoding()));
         return this.writer;
     }

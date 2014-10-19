@@ -21,8 +21,8 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -253,15 +253,15 @@ public class HttpServletRequestImpl extends ServletRequestImpl implements HttpSe
      * @param name Name of the requested header
      */
     @Override
+@SuppressWarnings("unchecked")
     public Enumeration getHeaders(String name) {
         name = name.toLowerCase();
-            List<String> values = headers.get(name);
-            if (values != null)
-//                return (new IteratorEnumeration( values.iterator() ));
-return null;
-            else
-//                return (new IteratorEnumeration( Collections.EMPTY_LIST.iterator() ));
-return null;
+        List<String> values = headers.get(name);
+        if (values != null){
+            return Collections.enumeration(values);
+        }
+        return Collections.enumeration(Collections.EMPTY_LIST);
+//        return Collections.enumeration(Collections.emptyList());
     }
 
     /**
@@ -269,8 +269,7 @@ return null;
      */
     @Override
     public Enumeration getHeaderNames() {
-//            return (new IteratorEnumeration( headers.keySet().iterator() ));
-return null;
+        return Collections.enumeration(headers.keySet());
     }
 
     /**

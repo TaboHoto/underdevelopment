@@ -35,7 +35,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionActivationListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionContext;
 import javax.servlet.http.HttpSessionEvent;
 
 //import org.apache.commons.collections.iterators.IteratorEnumeration;
@@ -411,7 +410,8 @@ public class HttpSessionImpl implements HttpSession, Serializable {
      *  Java Servlet API.
      */
     @Override
-    public HttpSessionContext getSessionContext() {
+    @Deprecated
+    public javax.servlet.http.HttpSessionContext getSessionContext() {
         return null;
     }
 

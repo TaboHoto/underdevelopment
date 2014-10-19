@@ -23,9 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
@@ -44,6 +46,7 @@ import javax.servlet.ServletRequest;
 public class ServletRequestImpl implements ServletRequest {
     // ----------------------------------------------------- Instance Variables
 
+    Map<String,List<String>> parameterMap = new HashMap<String,List<String>>();
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
@@ -149,9 +152,7 @@ public class ServletRequestImpl implements ServletRequest {
      */
     @Override
     public Object getAttribute(String name) {
-        synchronized (attributes) {
-            return attributes.get(name);
-        }
+        return attributes.get(name);
     }
 
     /**
@@ -160,10 +161,7 @@ public class ServletRequestImpl implements ServletRequest {
      */
     @Override
     public Enumeration getAttributeNames() {
-        synchronized (attributes) {
-//            return new IteratorEnumeration(attributes.keySet().iterator());
-return null; //TODO
-        }
+        return Collections.enumeration(attributes.keySet());
     }
 
     /**
@@ -220,12 +218,10 @@ return null; //TODO
      */
     @Override
     public Locale getLocale() {
-        synchronized (locales) {
-            if (locales.size() > 0)
-                return (Locale) locales.get(0);
-            else
-                return defaultLocale;
-        }
+        if (locales.size() > 0)
+            return locales.get(0);
+        else
+            return defaultLocale;
     }
 
     /**
@@ -236,14 +232,10 @@ return null; //TODO
      */
     @Override
     public Enumeration getLocales() {
-        synchronized (locales) {
-            if (locales.size() > 0) {
-//                return new IteratorEnumeration( locales.iterator() );
-return null; //TODO
-            }
+        if (locales.size() > 0) {
+            return Collections.enumeration(locales);
         }
-//        return new IteratorEnumeration( new SingletonIterator( defaultLocale ) );
-return null; //TODO
+        return Collections.enumeration(Collections.singletonList(defaultLocale));
     }
 
     /**
@@ -255,11 +247,11 @@ return null; //TODO
      */
     @Override
     public String getParameter(String name) {
-        String values[] = (String[]) getParameterMap().get(name);
-        if (values != null)
-            return (values[0]);
-        else
-            return (null);
+        List<String> values = parameterMap.get(name);
+        if (values == null){
+            return null;
+        }
+        return values.get(0);
     }
 
     /**
@@ -270,11 +262,11 @@ return null; //TODO
      */
     @Override
     public String[] getParameterValues(String name) {
-        String values[] = (String[]) getParameterMap().get(name);
-        if (values != null)
-            return (values);
-        else
-            return (null);
+        List<String> values = parameterMap.get(name);
+        if (values == null){
+            return null;
+        }
+        return values.toArray(new String[0]);
     }
 
     /**
@@ -288,7 +280,7 @@ return null; //TODO
      */
     @Override
     public Map getParameterMap() {
-        return new HashMap();
+        return parameterMap;
     }
 
     /**
@@ -296,10 +288,8 @@ return null; //TODO
      */
     @Override
     public Enumeration getParameterNames() {
-//        return new IteratorEnumeration(getParameterMap().keySet().iterator());
-return null; //TODO
+        return Collections.enumeration(parameterMap.keySet());
     }
-    
 
     /**
      * Return the protocol and version used to make this Request.
