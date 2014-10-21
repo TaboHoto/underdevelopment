@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
 import java.util.Map;
+import java.nio.charset.Charset;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -218,10 +219,10 @@ public class ServletRequestImpl implements ServletRequest {
      */
     @Override
     public Locale getLocale() {
-        if (locales.size() > 0)
+        if (locales.size() > 0) {
             return locales.get(0);
-        else
-            return defaultLocale;
+        }
+        return defaultLocale;
     }
 
     /**
@@ -332,14 +333,13 @@ public class ServletRequestImpl implements ServletRequest {
      */
     @Override
     public String getRealPath(String path) {
-        if (servletContext == null)
-            return (null);
-        else {
-            try {
-                return (servletContext.getRealPath(path));
-            } catch (IllegalArgumentException e) {
-                return (null);
-            }
+        if (servletContext == null){
+            return null;
+        }
+        try {
+            return servletContext.getRealPath(path);
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 
@@ -410,9 +410,7 @@ public class ServletRequestImpl implements ServletRequest {
      */
     @Override
     public void removeAttribute(String name) {
-        synchronized (attributes) {
-            attributes.remove(name);
-        }
+        attributes.remove(name);
     }
 
     /**
@@ -432,9 +430,7 @@ public class ServletRequestImpl implements ServletRequest {
             removeAttribute(name);
             return;
         }
-        synchronized (attributes) {
-            attributes.put(name, value);
-        }
+        attributes.put(name, value);
     }
 
     /**
@@ -452,10 +448,9 @@ public class ServletRequestImpl implements ServletRequest {
     @Override
     public void setCharacterEncoding(String enc)
         throws UnsupportedEncodingException {
-        // Ensure that the specified encoding is valid
-        byte buffer[] = new byte[1];
-        buffer[0] = (byte) 'a';
-        String dummy = new String(buffer, enc);
+        if(Charset.isSupported(enc) == false){
+            throw new UnsupportedEncodingException(enc);
+        }
         // Save the validated encoding
         this.characterEncoding = enc;
     }
